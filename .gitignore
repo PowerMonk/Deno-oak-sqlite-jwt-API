@@ -1,0 +1,8 @@
+# Ignore the SQLite database file
+megafonito.db
+
+# Ignore environment variables file
+.env
+
+# Ignore Deno dependencies
+deno.lock
