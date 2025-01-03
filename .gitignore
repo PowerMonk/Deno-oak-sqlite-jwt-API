@@ -6,3 +6,4 @@ megafonito.db
 
 # Ignore Deno dependencies
 deno.lock
+.deno/

@@ -1,0 +1,18 @@
+# NOT REQUIRED version: "2.32.1"
+
+services:
+  api:
+    # Build the Docker image using the Dockerfile in the current directory
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+      # Mount the SQLite database file as a volume so it persists between container restarts
+    volumes:
+      # The format of this volume mount is: <host_path>:<container_path>:<access_mode> (read-write)
+      - ./megafonito.db:/app/megafonito.db:rw
+      - .:/app
+      # Set environment variables needed for the application
+    environment:
+      - SECRET_JWT=${SECRET_JWT} # Pass the JWT secret from host environment
