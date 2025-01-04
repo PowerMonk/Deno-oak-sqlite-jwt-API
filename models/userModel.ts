@@ -25,6 +25,12 @@ export function getUserByUsername(username: string) {
     `;
   return queryOne(query, username);
 }
+export function getUserById(userId: number) {
+  const query = `
+      SELECT * FROM users WHERE id = ?;
+    `;
+  return queryOne(query, userId);
+}
 
 export function updateUser(userId: number, username: string, email: string) {
   const query = `
