@@ -2,6 +2,10 @@ import { Database } from "jsr:@db/sqlite";
 
 const db = new Database("megafonito.db");
 
+export interface DatabaseRow {
+  [key: string]: string | number | boolean | null | Uint8Array;
+}
+
 /**
  * Executes a SQL query that modifies the database (e.g., INSERT, UPDATE, DELETE).
  * @param query - The SQL query string to be executed.
@@ -33,7 +37,7 @@ export function execute(
  * @returns An array of rows resulting from the query execution.
  * @throws Will throw an error if the query execution fails.
  */
-export function queryAll<T = unknown>(
+export function queryAll<T extends DatabaseRow>(
   query: string,
   ...params: (string | number | null | Uint8Array | boolean)[]
 ): T[] {
@@ -56,7 +60,7 @@ export function queryAll<T = unknown>(
  * @returns A single row resulting from the query execution.
  * @throws Will throw an error if the query execution fails.
  */
-export function queryOne<T = unknown>(
+export function queryOne<T extends DatabaseRow>(
   query: string,
   ...params: (string | number | null | Uint8Array | boolean)[]
 ): T | null {
