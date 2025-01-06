@@ -1,9 +1,23 @@
-// Este archivo debe contener utilidades para formatear las respuestas de tu API de manera consistente.
-// Por ejemplo, asegurar que todas las respuestas exitosas tienen una estructura similar, o que los errores se presentan de manera uniforme.
-
 import { Middleware, Status } from "@oak/oak";
 import { LogEntry, SuccessResponse, ErrorResponse } from "./utilsMod.ts";
+import * as log from "@std/log"; // Import the logging library
 
+// Configure the logger (optional, but recommended)
+await log.setup({
+  handlers: {
+    console: new log.ConsoleHandler("DEBUG", {
+      useColors: false,
+    }), // Log to console with DEBUG level
+  },
+  loggers: {
+    default: {
+      level: "DEBUG", // Set the default log level
+      handlers: ["console"], // Use the console handler
+    },
+  },
+});
+
+// Helper function to format success responses
 export const formatSuccessResponse = (
   message: string,
   code: number = 200,
@@ -20,6 +34,7 @@ export const formatSuccessResponse = (
   return response;
 };
 
+// Helper function to format error responses
 export const formatErrorResponse = (
   status: Status,
   message: string,
@@ -40,7 +55,7 @@ export const formatErrorResponse = (
   return response;
 };
 
-// Middleware type requires this specific signature
+// Improved logging middleware using @std/log
 export const loggingMiddleware: Middleware = async (ctx, next) => {
   const entry: LogEntry = {
     method: ctx.request.method,
@@ -53,21 +68,35 @@ export const loggingMiddleware: Middleware = async (ctx, next) => {
   try {
     await next();
 
+    // Calculate duration and update log entry
     entry.endTime = Date.now();
     entry.duration = entry.endTime - entry.startTime;
-    // entry.status = ctx.response.status || 200;
     entry.status = ctx.response.status;
 
-    console.log(
-      `${entry.method} ${entry.url}\nDuration: ${entry.duration}ms | Status: ${entry.status}`
-    );
-    // console.log(entry);
+    // Log the request details using @std/log
+    log.info(`${entry.method} | ${entry.url} | ${entry.status}`, {
+      duration: `${entry.duration}ms`,
+      status: entry.status,
+    });
+
+    // Attach the log entry to the context state for later use
     ctx.state.logEntry = entry;
   } catch (error) {
+    // Update log entry for errors
     entry.endTime = Date.now();
     entry.duration = entry.endTime - entry.startTime;
     entry.status = 500;
-    console.error(`Error: ${error} - ${entry.method} ${entry.url}`);
+
+    // Log the error using @std/log
+    log.error(
+      `Error: ${error} - ${entry.method} | ${entry.url} | ${entry.status}`,
+      {
+        duration: `${entry.duration}ms`,
+        status: entry.status,
+      }
+    );
+
+    // Re-throw the error to let Oak handle it
     throw error;
   }
 };
