@@ -1,29 +1,6 @@
-import { Middleware, RouterContext } from "@oak/oak";
-import { formatErrorResponse, isEmptyObject } from "./utilsMod.ts";
+import { RouterContext } from "@oak/oak";
+import { isEmptyObject } from "./utilsMod.ts";
 import { getUserByUsername, getUserById } from "../models/modelsMod.ts";
-
-export class APIError extends Error {
-  status: number;
-
-  constructor(message: string, status: number) {
-    super(message);
-    this.status = status;
-  }
-}
-
-export const errorMiddleware: Middleware = async (ctx, next) => {
-  try {
-    await next();
-  } catch (error) {
-    const status = error instanceof APIError ? error.status : 500;
-    const message =
-      error instanceof Error ? error.message : "Internal Server Error";
-    const errorType = error instanceof APIError ? "APIError" : "UnhandledError";
-
-    ctx.response.status = status;
-    ctx.response.body = formatErrorResponse(status, message, { errorType });
-  }
-};
 
 export function checkUserExistsByUsername(
   ctx: RouterContext<string>,
@@ -50,3 +27,24 @@ export function checkUserExistsById(
   }
   return user;
 }
+
+export const formatErrorResponse = (
+  status: number,
+  message: string,
+  additionalDetails?: Record<string, unknown>
+) => {
+  const response = {
+    success: false,
+    error: {
+      status,
+      message: message,
+      date: Date.now(),
+    },
+  };
+  if (additionalDetails)
+    response.error = {
+      ...response.error,
+      ...additionalDetails,
+    };
+  return response;
+};

@@ -1,9 +1,5 @@
 import { Application } from "@oak/oak";
-import {
-  errorMiddleware,
-  formatSuccessResponse,
-  loggingMiddleware,
-} from "./utils/utilsMod.ts";
+import { loggingErrorMiddleware, loggingMiddleware } from "./utils/utilsMod.ts";
 import { initializeDatabase } from "./db/dbMod.ts";
 import { router } from "./routes/routesMod.ts";
 
@@ -14,13 +10,12 @@ initializeDatabase();
 
 // Define routes
 router.get("/healthy", (ctx) => {
-  ctx.response.body = formatSuccessResponse("Service is healthy", 200, {
-    timestamp: Date.now(),
-  });
+  ctx.response.body = "Service is healthy";
+  ctx.response.status = 200;
 });
 
 // Global middleware
-app.use(errorMiddleware);
+app.use(loggingErrorMiddleware);
 app.use(loggingMiddleware);
 
 // Add router middleware
