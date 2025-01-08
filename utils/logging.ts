@@ -41,8 +41,12 @@ export class Logging {
   }
 
   logError(error: Error, entry: LogEntry) {
+    // log.error(
+    //   `Error: ${error.message} - ${entry.method} | ${entry.url} | ${entry.status} | ${entry.duration}ms`
+    // );
+    //  The logging library treats the primary message as a string and doesn't stringify subsequent objects unless explicitly passed as additional arguments.
     log.error(
-      `Error: ${error.message} - ${entry.method} | ${entry.url} | ${entry.status} | ${entry.duration}ms`
+      `Error: ${error.message}\nEntry: ${JSON.stringify(entry, null, 2)}`
     );
   }
 }
@@ -70,13 +74,10 @@ export const loggingMiddleware: Middleware = async (ctx, next) => {
   } catch (error) {
     entry.endTime = Date.now();
     entry.duration = entry.endTime - entry.startTime;
-    entry.status = 500;
+    // If undenfined or null, set the status to 500
+    entry.status = ctx.response.status ?? 500;
 
-    logger.logError(
-      error instanceof Error ? error : new Error("Unknown error occurred"),
-      entry
-    );
-
+    // Don't need the logError function here because that is why we have the loggingErrorMiddleware
     throw error;
   }
 };
@@ -85,8 +86,8 @@ export const loggingErrorMiddleware: Middleware = async (ctx, next) => {
   try {
     await next();
   } catch (error) {
-    // Use the status from the context if it exists, otherwise default to 500
-    const status = ctx.response.status || 500;
+    // If undenfined or null, set the status to 500
+    const status = ctx.response.status ?? 500;
     const message =
       error instanceof Error ? error.message : "Internal Server Error";
 
@@ -95,14 +96,18 @@ export const loggingErrorMiddleware: Middleware = async (ctx, next) => {
       errorType: status >= 500 ? "UnhandledError" : "ClientError",
     });
 
+    // Log the error with detailed context
     const entry: LogEntry = {
       method: ctx.request.method,
       url: ctx.request.url.toString(),
-      startTime: Date.now(),
+      startTime: ctx.state.logEntry?.startTime || Date.now(),
       endTime: Date.now(),
-      duration: 0,
+      duration: Date.now() - (ctx.state.logEntry?.startTime || Date.now()), // Update duration based on timing
       status,
     };
+
+    // console.log(entry);
+    // console.log("----------------");
 
     logger.logError(
       error instanceof Error ? error : new Error("Unknown error occurred"),

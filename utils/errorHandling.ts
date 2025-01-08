@@ -1,12 +1,13 @@
 import { RouterContext } from "@oak/oak";
 import { isEmptyObject } from "./utilsMod.ts";
 import { getUserByUsername, getUserById } from "../models/modelsMod.ts";
+import { safeQuery } from "../db/dbMod.ts";
 
 export function checkUserExistsByUsername(
   ctx: RouterContext<string>,
   username: string
 ) {
-  const user = getUserByUsername(username);
+  const user = safeQuery(() => getUserByUsername(username));
   if (isEmptyObject(user)) {
     ctx.response.status = 404;
     ctx.response.body = { error: "User not found" };
@@ -19,7 +20,7 @@ export function checkUserExistsById(
   ctx: RouterContext<string>,
   userId: number
 ) {
-  const user = getUserById(userId);
+  const user = safeQuery(() => getUserById(userId));
   if (isEmptyObject(user)) {
     ctx.response.status = 404;
     ctx.response.body = { error: "User not found" };
@@ -37,14 +38,12 @@ export const formatErrorResponse = (
     success: false,
     error: {
       status,
-      message: message,
-      date: Date.now(),
+      message,
+      date: new Date().toISOString(),
     },
   };
-  if (additionalDetails)
-    response.error = {
-      ...response.error,
-      ...additionalDetails,
-    };
+  if (additionalDetails) {
+    Object.assign(response.error, additionalDetails);
+  }
   return response;
 };

@@ -9,10 +9,14 @@ const app = new Application();
 initializeDatabase();
 
 // Define routes
-router.get("/healthy", (ctx) => {
-  ctx.response.body = "Service is healthy";
-  ctx.response.status = 200;
-});
+router
+  .get("/healthy", (ctx) => {
+    ctx.response.body = "Service is healthy";
+    ctx.response.status = 200;
+  })
+  .post("/test-error", (_ctx) => {
+    throw new Error("Simulated error for testing!");
+  });
 
 // Global middleware
 app.use(loggingErrorMiddleware);

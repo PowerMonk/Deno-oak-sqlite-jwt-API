@@ -1,4 +1,5 @@
 import { Database } from "jsr:@db/sqlite";
+import { AppError } from "../utils/utilsMod.ts";
 
 const db = new Database("megafonito.db");
 
@@ -99,6 +100,19 @@ export function executeTransaction(
   } catch (error) {
     console.error("Transaction execution error:", error);
     throw error;
+  }
+}
+
+export function safeQuery<T extends DatabaseRow>(
+  queryFn: () => T | null
+): T | null {
+  try {
+    return queryFn();
+  } catch (error) {
+    // Log and re-throw the error as an AppError
+    throw new AppError(`Database query error: ${error}`, 500, {
+      type: "DatabaseError",
+    });
   }
 }
 
