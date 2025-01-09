@@ -76,7 +76,7 @@ export async function userUpdaterHandler(ctx: RouterContext<string>) {
   //   const { username, email, userId } = await ctx.request.body.json();
   const { username, email } = await ctx.request.body.json();
   try {
-    const user = checkUserExistsByUsername(ctx, username);
+    const user = checkUserExistsById(ctx, userId);
     if (!user) return;
 
     updateUser(userId, username, email);

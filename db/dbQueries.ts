@@ -1,5 +1,4 @@
 import { Database } from "jsr:@db/sqlite";
-import { AppError } from "../utils/utilsMod.ts";
 
 const db = new Database("megafonito.db");
 
@@ -87,32 +86,23 @@ export function queryOne<T extends DatabaseRow>(
 export function executeTransaction(
   queries: string[],
   params: (string | number | null | Uint8Array | boolean)[][]
-) {
+): number[] {
+  const results: number[] = [];
+
   const transaction = db.transaction(() => {
     for (let i = 0; i < queries.length; i++) {
-      db.prepare(queries[i]).run(...params[i]);
+      const result = db.prepare(queries[i]).run(...params[i]);
+      results.push(result);
     }
   });
 
   try {
     transaction();
     console.log("Transaction executed successfully!");
+    return results;
   } catch (error) {
     console.error("Transaction execution error:", error);
     throw error;
-  }
-}
-
-export function safeQuery<T extends DatabaseRow>(
-  queryFn: () => T | null
-): T | null {
-  try {
-    return queryFn();
-  } catch (error) {
-    // Log and re-throw the error as an AppError
-    throw new AppError(`Database query error: ${error}`, 500, {
-      type: "DatabaseError",
-    });
   }
 }
 
