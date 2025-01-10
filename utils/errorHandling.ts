@@ -1,32 +1,49 @@
-import { RouterContext } from "@oak/oak";
+// import { RouterContext } from "@oak/oak";
 import { isEmptyObject } from "./utilsMod.ts";
-import { getUserByUsername, getUserById } from "../models/modelsMod.ts";
-import { safeQuery } from "../db/dbMod.ts";
+import {
+  getUserByUsername,
+  getUserById,
+  getNoticesByNoticeId,
+} from "../models/modelsMod.ts";
 
-export function checkUserExistsByUsername(
-  ctx: RouterContext<string>,
-  username: string
-) {
-  const user = safeQuery(() => getUserByUsername(username));
+export function checkUserExistsByUsername(username: string) {
+  const user = getUserByUsername(username);
   if (isEmptyObject(user)) {
-    ctx.response.status = 404;
-    ctx.response.body = { error: "User not found" };
-    return null;
+    throw new Error(`User not found with username: ${username}`);
   }
   return user;
 }
 
-export function checkUserExistsById(
-  ctx: RouterContext<string>,
-  userId: number
-) {
-  const user = safeQuery(() => getUserById(userId));
+export function checkUserExistsById(userId: number) {
+  const user = getUserById(userId);
   if (isEmptyObject(user)) {
-    ctx.response.status = 404;
-    ctx.response.body = { error: "User not found" };
-    return null;
+    throw new Error(`User not found with id: ${userId}`);
   }
   return user;
+}
+// Pending to get implementation in the noticeController.ts
+export function checkNoticeExistsByUsername(username: string) {
+  const user = getUserByUsername(username);
+  if (isEmptyObject(user)) {
+    throw new Error(`User not found with username: ${username}`);
+  }
+  return user;
+}
+
+export function checkNoticeExistsByUserId(userId: number) {
+  const user = getUserById(userId);
+  if (isEmptyObject(user)) {
+    throw new Error(`User not found with id: ${userId}`);
+  }
+  return user;
+}
+
+export function checkNoticeExistsByNoticeId(noticeId: number) {
+  const notice = getNoticesByNoticeId(noticeId);
+  if (isEmptyObject(notice)) {
+    throw new Error(`Notice not found with id: ${noticeId}`);
+  }
+  return notice;
 }
 
 export const formatErrorResponse = (
