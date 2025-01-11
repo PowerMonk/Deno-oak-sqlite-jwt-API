@@ -1,9 +1,19 @@
 # TO DOs
 
-## Dockerize the app
+## DONE
 
 - Docker init and setup the db.
-  ==DONE==
+
+- Logging:
+
+  Implement a more robust logging system using a library like log from Deno's standard library.
+
+- Error Handling:
+
+  Improve error handling by creating custom error classes and middleware to handle different types of errors.
+
+## Dockerize the app
+
 - Still need to improve the dev compose.
 
 ## Recommendations for Further Implementations:
@@ -12,17 +22,9 @@
 
   Implement unit tests for your controllers, models, and utility functions. Use a testing framework like Deno's built-in testing library.
 
-- Error Handling:
-
-  Improve error handling by creating custom error classes and middleware to handle different types of errors.
-
 - Validation:
 
   Enhance validation logic using a library like zod or yup for more comprehensive validation.
-
-- Logging:
-
-  Implement a more robust logging system using a library like log from Deno's standard library.
 
 - Rate Limiting:
 

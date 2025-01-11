@@ -1,5 +1,9 @@
 import { Application } from "@oak/oak";
-import { loggingErrorMiddleware, loggingMiddleware } from "./utils/utilsMod.ts";
+import {
+  loggingErrorMiddleware,
+  loggingMiddleware,
+  rateLimiter,
+} from "./utils/utilsMod.ts";
 import { initializeDatabase } from "./db/dbMod.ts";
 import { router } from "./routes/routesMod.ts";
 
@@ -21,6 +25,7 @@ router
 // Global middleware
 app.use(loggingErrorMiddleware);
 app.use(loggingMiddleware);
+app.use(rateLimiter);
 
 // Add router middleware
 app.use(router.routes());
