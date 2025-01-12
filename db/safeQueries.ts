@@ -29,7 +29,6 @@ export function safeExecute(queryFn: () => number): number {
   try {
     return queryFn();
   } catch (error) {
-    // Log and re-throw the error as an AppError
     throw new AppError(`Database execute error: ${error}`, 500, {
       type: "DatabaseError",
     });
@@ -40,7 +39,6 @@ export function safeExecuteTransaction(queryFn: () => number[]): number[] {
   try {
     return queryFn();
   } catch (error) {
-    // Log and re-throw the error as an AppError
     throw new AppError(`Database execute transaction error: ${error}`, 500, {
       type: "DatabaseError",
     });
