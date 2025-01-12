@@ -32,8 +32,7 @@ export const rateLimiter: Middleware = async (ctx, next) => {
 
   if (clientData.count >= limit) {
     ctx.response.status = 429;
-    ctx.response.body = { error: "Rate limit exceeded" };
-    return;
+    throw new Error("Rate limit exceeded");
   }
 
   clientData.count++;
