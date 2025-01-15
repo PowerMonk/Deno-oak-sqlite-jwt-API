@@ -56,7 +56,7 @@ The server will start on `http://localhost:8000`.
 
 ### Authentication
 
-#### **_For Every method besies these two displayed in authentication, you'll hav to be logged in._**
+#### **_For every method besides these two displayed in authentication, you'll have to be logged in._**
 
 - `POST /users` - Create a user so that you can login in the future, this will also return a JWT to do the rest of the operations.
 
